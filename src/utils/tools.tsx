@@ -52,19 +52,19 @@ export const EDITOR_JS_TOOLS = {
     config: {
       uploader: {
         async uploadByFile(file: any) {
-          let storageRef = firebase.storage().ref();
-          let imagesRef = storageRef.child('EditorJS').child('images/' + file.name);
-          let metadata = {
-            contentType: 'image/jpeg'
-          };
-          let uploadTask = await imagesRef.put(file, metadata);
-          const downloadURL = await uploadTask.ref.getDownloadURL();
-          return {
-            success: 1,
-            file: {
-              url: downloadURL
-            }
-          }
+          // let storageRef = firebase.storage().ref();
+          // let imagesRef = storageRef.child('EditorJS').child('images/' + file.name);
+          // let metadata = {
+          //   contentType: 'image/jpeg'
+          // };
+          // let uploadTask = await imagesRef.put(file, metadata);
+          // const downloadURL = await uploadTask.ref.getDownloadURL();
+          // return {
+          //   success: 1,
+          //   file: {
+          //     url: downloadURL
+          //   }
+          // }
         }
       }
     }
