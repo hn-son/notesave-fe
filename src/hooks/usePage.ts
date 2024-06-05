@@ -3,7 +3,12 @@ import EditorJS from "@editorjs/editorjs";
 import { useState, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router";
 import { EDITOR_JS_TOOLS } from "../utils/tools";
-import { createNotePageApi } from "../api/index";
+import {
+  createNotePageApi,
+  getPagesApi,
+  updateNoteApi,
+  softDeletePageApi,
+} from "../api/index";
 import { toast } from "react-toastify";
 
 const usePage = () => {
@@ -22,15 +27,25 @@ const usePage = () => {
 
   useEffect(() => {
     if (id) {
-      const pageData = pages.find((page: any) => page.id === id);
+      const pageData = pages.find((page: any) => page._id === id);
       setPage(pageData);
     }
   }, [id, pages]);
 
   useEffect(() => {
-    if (page && page.id) {
+    getPagesApi()
+      .then((r) => {
+        setPages(r);
+      })
+      .catch(() => {
+        toast.error("Cannot load pages");
+      });
+  }, []);
+
+  useEffect(() => {
+    if (page && page._id) {
       const editor: any = new EditorJS({
-        holder: `editorjs-container-${page.id}`,
+        holder: `editorjs-container-${page._id}`,
         tools: EDITOR_JS_TOOLS,
         data: page.note as any,
         onReady: () => {
@@ -40,7 +55,9 @@ const usePage = () => {
         onChange: async () => {
           const content = await editor.saver.save();
           const updatedPage = { ...page, note: content };
-          setPages(pages.map((p: any) => (p.id === page.id ? updatedPage : p)));
+          setPages(
+            pages.map((p: any) => (p._id === page._id ? updatedPage : p))
+          );
         },
       });
     }
@@ -57,8 +74,17 @@ const usePage = () => {
         .save()
         .then((outputData: any) => {
           const updatedPage = { ...page, note: outputData };
-          setPages(pages.map((p: any) => (p.id === page.id ? updatedPage : p)));
-          toast.success("Saving successfully");
+          console.log(updatedPage);
+          updateNoteApi(updatedPage)
+            .then(() => {
+              setPages(
+                pages.map((p: any) => (p._id === page._id ? updatedPage : p))
+              );
+              toast.success("Saving successfully");
+            })
+            .catch((error: any) => {
+              toast.error(`Saving failed: ${error}`);
+            });
         })
         .catch((error: any) => {
           toast.error(`Saving failed: ${error}`);
@@ -78,7 +104,7 @@ const usePage = () => {
       createNotePageApi(newPageObject)
         .then((pageRes: any) => {
           toast.success("Create page successfully");
-          newPageObject.id = pageRes.insertedId;
+          newPageObject._id = pageRes.insertedId;
           setPages([...pages, newPageObject]);
         })
         .catch(() => {
@@ -89,7 +115,7 @@ const usePage = () => {
 
   const toggle = (page: any) => {
     const updatedPage = { ...page, active: !page.active };
-    setPages(pages.map((p: any) => (p.id === page.id ? updatedPage : p)));
+    setPages(pages.map((p: any) => (p._id === page._id ? updatedPage : p)));
   };
 
   const deletePage = (pageId: any) => {
@@ -97,20 +123,26 @@ const usePage = () => {
       "Are you sure you want to delete this page?"
     );
     if (confirmDelete) {
-      setPages(pages.filter((p: any) => p.id !== pageId));
-      if (page.id === pageId) {
-        setPage({});
-        if (ejInstance.current) {
-          ejInstance.current.clear();
-        }
-        toast.success("Page deleted")
-      }
+      softDeletePageApi(pageId)
+        .then(() => {
+          setPages(pages.filter((p: any) => p._id !== pageId));
+          if (page._id === pageId) {
+            setPage({});
+            if (ejInstance.current) {
+              ejInstance.current.clear();
+            }
+          }
+          toast.success("Page deleted");
+        })
+        .catch(() => {
+          toast.error("Cannot delete");
+        });
     }
   };
 
   const handlePageClick = (page: any) => {
     setPage(page);
-    history.replace(`/page/${page.id}`);
+    history.replace(`/page/${page._id}`);
   };
 
   return {

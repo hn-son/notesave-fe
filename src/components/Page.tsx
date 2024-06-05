@@ -41,14 +41,14 @@ const Page: React.FC = () => {
       <li key={index}>
         <div
           className={
-            location.pathname.includes(item.id)
+            location.pathname.includes(item._id)
               ? "hightlight selectable"
               : "selectable"
           }
           onClick={() => handlePageClick(item)}
         >
           <span className="dropdown-icon">
-            {items.some((i: any) => i.parentId === item.id) && (
+            {items.some((i: any) => i.parentId === item._id) && (
               <span
                 className={`caret ${item.active ? "caret-active" : ""}`}
                 onClick={() => {
@@ -64,7 +64,7 @@ const Page: React.FC = () => {
             <span
               className="plus-icon"
               onClick={() => {
-                addPage(item.id);
+                addPage(item._id);
               }}
             >
               <IonIcon icon={addOutline}></IonIcon>
@@ -73,7 +73,7 @@ const Page: React.FC = () => {
               className="delete-icon"
               onClick={(e) => {
                 e.stopPropagation(); // Prevent triggering the click event on the parent element
-                deletePage(item.id);
+                deletePage(item._id);
               }}
             >
               <IonIcon icon={trashOutline}></IonIcon>{" "}
@@ -83,7 +83,7 @@ const Page: React.FC = () => {
         </div>
         <ul className={`nested ${item.active ? "active" : ""}`}>
           {items
-            .filter((i: any) => i.parentId === item.id)
+            .filter((i: any) => i.parentId === item._id)
             .map((child: any, i: any) =>
               renderPage(child, `${index}-${i}`, items)
             )}
@@ -123,10 +123,10 @@ const Page: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonContent fullscreen>
-          {page.id ? (
+          {page._id ? (
             <>
               <br />
-              <div id={`editorjs-container-${page.id}`} />
+              <div id={`editorjs-container-${page._id}`} />
             </>
           ) : (
             <div className="placeholder">Choose pages to display note</div>
