@@ -58,7 +58,7 @@ const Page: React.FC = () => {
                 <IonIcon icon={chevronForwardOutline}></IonIcon>
               </span>
             )}
-            <span>{item.name}</span>
+            <span>{item.noteName}</span>
           </span>
           <div className="options">
             <span
@@ -116,7 +116,7 @@ const Page: React.FC = () => {
             <IonButtons slot="start">
               <IonMenuButton autoHide={false} onClick={toggleMenu} />
             </IonButtons>
-            <IonTitle>{page?.name}</IonTitle>
+            <IonTitle>{page?.noteName}</IonTitle>
             <IonButtons slot="end">
               <IonButton onClick={saveData}>Save</IonButton>
             </IonButtons>

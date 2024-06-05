@@ -3,6 +3,8 @@ import EditorJS from "@editorjs/editorjs";
 import { useState, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router";
 import { EDITOR_JS_TOOLS } from "../utils/tools";
+import { createNotePageApi } from "../api/index";
+import { toast } from "react-toastify";
 
 const usePage = () => {
   const [page, setPage] = useState<any>({});
@@ -12,9 +14,11 @@ const usePage = () => {
   const { id } = useParams<{ id: string }>();
   const [menuEnabled, setMenuEnabled] = useState(true);
 
+  console.log(pages);
+
   const toggleMenu = () => {
-    setMenuEnabled(!menuEnabled)
-  }
+    setMenuEnabled(!menuEnabled);
+  };
 
   useEffect(() => {
     if (id) {
@@ -30,7 +34,11 @@ const usePage = () => {
         tools: EDITOR_JS_TOOLS,
         data: page.note as any,
         onReady: () => {
-          const content = editor.saver.save();
+          ejInstance.current = editor;
+        },
+        autofocus: true,
+        onChange: async () => {
+          const content = await editor.saver.save();
           const updatedPage = { ...page, note: content };
           setPages(pages.map((p: any) => (p.id === page.id ? updatedPage : p)));
         },
@@ -49,11 +57,11 @@ const usePage = () => {
         .save()
         .then((outputData: any) => {
           const updatedPage = { ...page, note: outputData };
-          console.log({ updatedPage });
           setPages(pages.map((p: any) => (p.id === page.id ? updatedPage : p)));
+          toast.success("Saving successfully");
         })
         .catch((error: any) => {
-          console.log("Saving failed: ", error);
+          toast.error(`Saving failed: ${error}`);
         });
     }
   };
@@ -62,30 +70,41 @@ const usePage = () => {
     const newPageName = prompt("Enter the new page:");
     if (newPageName) {
       const newPageObject: any = {
-        name: newPageName,
+        noteName: newPageName,
         parentId: parentId,
         active: false,
         note: { blocks: [] },
       };
-      setPages([...pages, newPageObject]);
+      createNotePageApi(newPageObject)
+        .then((pageRes: any) => {
+          toast.success("Create page successfully");
+          newPageObject.id = pageRes.insertedId;
+          setPages([...pages, newPageObject]);
+        })
+        .catch(() => {
+          toast.error("Cannot create page");
+        });
     }
   };
 
   const toggle = (page: any) => {
     const updatedPage = { ...page, active: !page.active };
-    setPages(pages.map((p: any) => p.id === page.id ? updatedPage : p));
-  }
+    setPages(pages.map((p: any) => (p.id === page.id ? updatedPage : p)));
+  };
 
   const deletePage = (pageId: any) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this page?");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this page?"
+    );
     if (confirmDelete) {
       setPages(pages.filter((p: any) => p.id !== pageId));
-        if (page.id === pageId) {
-          setPage({});
-          if (ejInstance.current) {
-            ejInstance.current.clear();
-          }
+      if (page.id === pageId) {
+        setPage({});
+        if (ejInstance.current) {
+          ejInstance.current.clear();
         }
+        toast.success("Page deleted")
+      }
     }
   };
 
@@ -103,8 +122,8 @@ const usePage = () => {
     addPage,
     saveData,
     deletePage,
-    handlePageClick
-  }
+    handlePageClick,
+  };
 };
 
-export default usePage
+export default usePage;

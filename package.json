@@ -28,11 +28,13 @@
     "@ionic/react": "^7.7.3",
     "@ionic/react-router": "^7.7.3",
     "@mrhoho/editor-js-video": "^2.8.2",
+    "axios": "^1.7.2",
     "ionicons": "^7.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "^5.3.4",
-    "react-router-dom": "^5.3.4"
+    "react-router-dom": "^5.3.4",
+    "react-toastify": "^10.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
