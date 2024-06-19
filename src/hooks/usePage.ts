@@ -19,8 +19,6 @@ const usePage = () => {
   const { id } = useParams<{ id: string }>();
   const [menuEnabled, setMenuEnabled] = useState(true);
 
-  console.log(pages);
-
   const toggleMenu = () => {
     setMenuEnabled(!menuEnabled);
   };
@@ -74,7 +72,6 @@ const usePage = () => {
         .save()
         .then((outputData: any) => {
           const updatedPage = { ...page, note: outputData };
-          console.log(updatedPage);
           updateNoteApi(updatedPage)
             .then(() => {
               setPages(

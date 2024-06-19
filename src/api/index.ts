@@ -34,3 +34,16 @@ export const updateNoteApi = async (data: any) => {
 export const softDeletePageApi = async (id: string) => {
   return await axios.put(`http://localhost:3001/api/v1/notes/${id}`);
 };
+
+export const uploadFile = async (file: any) => {
+  return await axios.post(
+    "http://localhost:3001/api/v1/notes/uploadFile",
+    file,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      withCredentials: false
+    }
+  );
+};
