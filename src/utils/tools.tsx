@@ -28,7 +28,12 @@ export const EDITOR_JS_TOOLS = {
   table: Table,
   marker: Marker,
   code: CodeTool,
-  linkTool: LinkTool,
+  linkTool: {
+    class: LinkTool,
+    config: {
+      endpoint: 'http://localhost:3001/api/v1/fetchUrl', // Your backend endpoint for url data fetching,
+    }
+  },
   raw: Raw,
   quote: Quote,
   checklist: {

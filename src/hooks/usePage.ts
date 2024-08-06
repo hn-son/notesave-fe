@@ -120,7 +120,7 @@ const usePage = () => {
       "Are you sure you want to delete this page?"
     );
     if (confirmDelete) {
-      softDeletePageApi(pageId)
+      return softDeletePageApi(pageId)
         .then(() => {
           setPages(pages.filter((p: any) => p._id !== pageId));
           if (page._id === pageId) {
